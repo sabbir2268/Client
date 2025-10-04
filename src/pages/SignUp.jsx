@@ -9,18 +9,22 @@ const SignUp = () => {
 
     const form = e.target;
     const formData = new FormData(form);
-    const { email, password, ...userProfile } = Object.fromEntries(
+    const { email, password, ...restFormData } = Object.fromEntries(
       formData.entries()
     );
-
-    console.log(email, password, userProfile);
 
     createUser(email, password)
       .then((result) => {
         const user = result.user;
-        console.log("User created successfully:", user);
 
-        // save user profile to your
+        const userProfile = {
+          email,
+          ...restFormData,
+          creationTime: user?.metadata?.creationTime,
+          lastSignInTime: user?.metadata?.lastSignInTime,
+        };
+
+        // save user profile to your database
         fetch("http://localhost:3000/users", {
           method: "POST",
           headers: {
@@ -31,7 +35,7 @@ const SignUp = () => {
           .then((res) => res.json())
           .then((data) => {
             if (data.insertedId) {
-              alert("User profile saved successfully");
+              alert("User profile created successfully");
             }
           });
       })
@@ -49,17 +53,31 @@ const SignUp = () => {
         <div className="text-center lg:text-left lg:w-1/2 p-6">
           <h1 className="text-5xl font-extrabold  mb-4">Welcome!</h1>
           <p className="py-6 ">
-            Securely log in to access your dashboard. We use industry-standard
-            security to keep your information safe. Sign up today if you're new!
+            Sign up to join our coffee community! Create an account to
+            personalize your experience, save favorites, and get exclusive
+            offers. It only takes a minute to start your journey with us.
           </p>
         </div>
 
         {/* Login Card Section */}
         <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl rounded-xl p-6 lg:w-1/2">
           <form onSubmit={handleSubmit} className="card-body p-0">
-            <h2 className="text-2xl font-semibold text-center mb-6">
-              Account Login
-            </h2>
+            <h2 className="text-2xl font-semibold text-center mb-6">Sign Up</h2>
+
+            <div className="form-control">
+              {/* Email Input */}
+              <label className="label">
+                <span className="label-text">Name</span>
+              </label>
+              <input
+                type="text"
+                className="input input-bordered w-full rounded-lg transition duration-150 focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="john doe"
+                autoComplete="name"
+                name="name"
+                required
+              />
+            </div>
 
             <div className="form-control">
               {/* Email Input */}
@@ -134,16 +152,6 @@ const SignUp = () => {
                 name="password"
                 required
               />
-
-              {/* Forgot Password Link */}
-              <div className="mt-2 text-right">
-                <a
-                  href="#"
-                  className="link link-hover text-sm text-primary/80 hover:text-primary transition duration-150"
-                >
-                  Forgot password?
-                </a>
-              </div>
             </div>
 
             <div className="form-control mt-6">
@@ -171,17 +179,17 @@ const SignUp = () => {
             </button>
 
             {/* Register Link */}
-            {/* <div className="mt-8 text-center">
+            <div className="mt-8 text-center">
               <p className="text-sm text-base-content/80">
-                New user?{" "}
+                Already have an account?{" "}
                 <a
-                  href="#"
+                  href="/signin"
                   className="link link-hover font-bold text-secondary transition duration-150 hover:underline"
                 >
-                  Register here!
+                  SignIn here!
                 </a>
               </p>
-            </div> */}
+            </div>
           </div>
         </div>
       </div>
